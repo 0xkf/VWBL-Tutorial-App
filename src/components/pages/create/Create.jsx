@@ -14,6 +14,7 @@ export const Create = () => {
   const [thumbnailUrl, setThumbnailUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
+  const [mimeType, setMimeType] = useState('');
   const { isOpen, handleOpen } = useDisclosure();
   const { web3, vwbl, connectWallet } = VwblContainer.useContainer();
 
@@ -49,8 +50,11 @@ export const Create = () => {
 
   const onChangeFile = useCallback((e) => {
     const file = e.target.files[0];
+    setMimeType(file?.type);
     setFile(file);
   }, []);
+
+  
 
   const onChangeThumbnail = useCallback((e) => {
     const thumbnail = e.target.files[0];
@@ -122,13 +126,15 @@ export const Create = () => {
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <FilePreviewer
             url={fileUrl}
+            mimeType={mimeType}
             inputId="asset"
-            acceptType=".jpeg,.jpg,.png,.gif"
+            acceptType=".jpeg,.jpg,.png,.gif,audio/*"
             opt={{
               ...register('asset', {
                 required: 'Asset is required',
                 validate: {
                   maxFileSize: (f) => f[0].size < MAX_FILE_SIZE || 'uploaded file is too large',
+                  validExtensions: (f) => VALID_EXTENSIONS.image.test(f[0].type) || VALID_EXTENSIONS.audio.test(f[0].type)|| VALID_EXTENSIONS.video.test(f[0].type) || 'invalid file type'
                 },
               }),
             }}
